@@ -1,8 +1,9 @@
 import React ,{ useState } from 'react';
 import { StyleSheet,SafeAreaView, Text, View,FlatList ,ScrollView,TouchableOpacity,Alert} from 'react-native';
 import Pushe from "pushe-react-native";
-import DialogInput from 'react-native-dialog-input';
+// import DialogInput from 'react-native-dialog-input';
 import {useAppState, ACTIONS} from "./AppStates";
+import DialogInput from "./DialogInput"
 
 const DATA = [
   {
@@ -14,27 +15,27 @@ const DATA = [
     title: 'Custom Id',
   },
   {
-    id: '2',
+    id: 'phone number',
     title: 'Phone Number',
   },
   {
-    id: '3',
+    id: 'email',
     title: 'Email',
   },
   {
-    id: '4',
+    id: 'module initialization',
     title: 'Modules initialization status',
   },
   {
-    id: '5',
+    id: 'device registration',
     title: 'Device registration status',
   },
   {
-    id: '6',
+    id: 'topic',
     title: 'Topic',
   },
   {
-    id: '7',
+    id: 'tag',
     title: 'Tag (name:value)',
   },
   {
@@ -77,7 +78,7 @@ function Dialog ({visibility,title,message,hint,button1,button2,onPressButton1,o
                 submitText ={button1}
                 cancelText ={button2}
                 submitInput={ (inputText) => {onPressButton1(inputText)} }
-                closeDialog={ () => {onPressButton2()}}>
+                closeDialog={ (inputText) => {onPressButton2(inputText)}}>
         </DialogInput>
     );
   // }
@@ -111,17 +112,6 @@ FlatListItemSeparator = () => {
 export default function App() {
   const [state, updateState] = useAppState();
 
-  // const [dialogVisible, setDialogVisibleState] = useState(false);
-  // const [dialogTitle, setDialoTitleState] = useState('');
-  // const [dialogButton1Action,setDialogButton1Action] = useState(()=>{})
-  // const [dialogButton2Action,setDialogButton2Action] = useState(()=>{})
-
-  // state = {
-  //   dialogVisible: false,
-  //   dialogTitle:''
-  // };
-
-  
   const onSelect = React.useCallback(
     async (id) => {
       switch(id) {
@@ -145,6 +135,97 @@ export default function App() {
                }
             });
           break;
+
+          case 'phone number':
+          const phoneNumber = await Pushe.getUserPhoneNumber();
+          updateState(
+            {
+              type: ACTIONS.SHOW_DIALOG,
+              payload:{
+                title:'Phone Number',
+                message:`Current Phone Number: ${phoneNumber}`,
+                button1Action:(inputData) => {  Pushe.setUserPhoneNumber(inputData); 
+                                                updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Phone Number is ${inputData}\n ${ new Date().toLocaleString()}`});
+                                             },
+                button2Action:() => { updateState({type: ACTIONS.HIDE_DIALOG});}
+               }
+            });
+          break;
+
+          case 'email':
+            const email = await Pushe.getUserEmail();
+            updateState(
+              {
+                type: ACTIONS.SHOW_DIALOG,
+                payload:{
+                  title:'Email',
+                  message:`Current Email: ${email}`,
+                  button1Action:(inputData) => {  Pushe.setUserEmail(inputData); 
+                                                  updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Email is ${inputData}\n ${ new Date().toLocaleString()}`});
+                                               },
+                  button2Action:() => { updateState({type: ACTIONS.HIDE_DIALOG});}
+                 }
+              });
+            break;
+            case 'module initialization':
+              const isInitialized = await Pushe.isInitialized()
+              updateState({type: ACTIONS.APPEND_LOG,log:state.log+"\n------------\n"+`Modules Initialized: ${isInitialized}\n ${ new Date().toLocaleString()}`});
+              break;
+
+            case 'device registration':
+              const isRegistered = await Pushe.isRegistered()
+              updateState({type: ACTIONS.APPEND_LOG,log:state.log+"\n------------\n"+`Device Registered: ${isRegistered}\n ${ new Date().toLocaleString()}`});
+              break;
+
+            case 'topic':
+                const topics = await Pushe.getSubscribedTopics();
+                updateState(
+                  {
+                    type: ACTIONS.SHOW_DIALOG,
+                    payload:{
+                      title:'Topic',
+                      message:`Topics: [${topics}]`,
+                      button1Title:'Subscribe',
+                      button2Title: 'Unsubscribe',
+                      button1Action:(inputData) => {  Pushe.subscribeToTopic(inputData); 
+                                                      updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Subscribed to ${inputData}\n ${ new Date().toLocaleString()}`});
+                                                   },
+                      button2Action:(inputData) => { if(inputData!="")
+                                                          {
+                                                             Pushe.unsubscribeFromTopic(inputData);
+                                                             updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Unsubscribe from ${inputData}\n ${ new Date().toLocaleString()}`});
+                                                          }
+                                                      else
+                                                      updateState({type: ACTIONS.HIDE_DIALOG,log:state.log});
+                                                   }
+                     }
+                  });
+                break;
+                
+            case 'tag':
+                  const topics = await Pushe.getSubscribedTopics();
+                  updateState(
+                    {
+                      type: ACTIONS.SHOW_DIALOG,
+                      payload:{
+                        title:'Topic',
+                        message:`Topics: [${topics}]`,
+                        button1Title:'Subscribe',
+                        button2Title: 'Unsubscribe',
+                        button1Action:(inputData) => {  Pushe.subscribeToTopic(inputData); 
+                                                        updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Subscribed to ${inputData}\n ${ new Date().toLocaleString()}`});
+                                                     },
+                        button2Action:(inputData) => { if(inputData!="")
+                                                            {
+                                                               Pushe.unsubscribeFromTopic(inputData);
+                                                               updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Unsubscribe from ${inputData}\n ${ new Date().toLocaleString()}`});
+                                                            }
+                                                        else
+                                                        updateState({type: ACTIONS.HIDE_DIALOG,log:state.log});
+                                                     }
+                       }
+                    });
+                  break;
       }
     }
   );
@@ -169,8 +250,8 @@ export default function App() {
       <Dialog  visibility={state.dialogVisiblity} 
                title={state.dialolgData.title} 
                message={state.dialolgData.message} 
-               button1 = 'Ok'
-               button2 = 'Cancel'
+               button1 = {state.dialolgData.button1Title}
+               button2 = {state.dialolgData.button2Title}
                onPressButton1={state.dialolgData.button1Action}
                onPressButton2={state.dialolgData.button2Action}
                

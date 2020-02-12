@@ -14,8 +14,8 @@ const initState = {
         message: '',
         button1Action:()=>{},
         button2Action:()=>{},
-        button1Title:'',
-        button2Title:'',
+        button1Title:'Ok',
+        button2Title:'Cancel',
     },
     log :'Click an action to test it'
 };
@@ -40,7 +40,7 @@ export function useAppState() {
           case ACTIONS.APPEND_LOG:
               return {
                   ...state,
-                  log: log +" "+ action.log
+                  log: action.log
               }
          
           default:

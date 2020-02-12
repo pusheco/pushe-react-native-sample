@@ -12,8 +12,7 @@
   "dependencies": {
     "pushe-react-native": "^2.0.1",
     "react": "16.9.0",
-    "react-native": "0.61.5",
-    "react-native-dialog-input": "^1.0.7"
+    "react-native": "0.61.5"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
