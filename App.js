@@ -1,7 +1,6 @@
-import React ,{ useState } from 'react';
+import React ,{ useState, Fragment } from 'react';
 import { StyleSheet,SafeAreaView, Text, View,FlatList ,ScrollView,TouchableOpacity,Alert} from 'react-native';
 import Pushe from "pushe-react-native";
-// import DialogInput from 'react-native-dialog-input';
 import {useAppState, ACTIONS} from "./AppStates";
 import DialogInput from "./DialogInput"
 
@@ -39,23 +38,23 @@ const DATA = [
     title: 'Tag (name:value)',
   },
   {
-    id: '8',
+    id: 'event',
     title: 'Analytics: Event',
   },
   {
-    id: '9',
+    id: 'ecommerce',
     title: 'Analytics: E-commerce',
   },
   {
-    id: '10',
+    id: 'notif-androidid',
     title: 'Notification: Android Id',
   },
   {
-    id: '11',
+    id: 'notif-googleid',
     title: 'Notification: Google Ad Id',
   },
   {
-    id: '12',
+    id: 'notif-customid',
     title: 'Notification: Custom Id',
   },
 ];
@@ -69,6 +68,7 @@ function Item({ id,title,onSelect }) {
     </TouchableOpacity>
   );
 }
+
 function Dialog ({visibility,title,message,hint,button1,button2,onPressButton1,onPressButton2}) {
     return (
       <DialogInput isDialogVisible={visibility}
@@ -81,9 +81,7 @@ function Dialog ({visibility,title,message,hint,button1,button2,onPressButton1,o
                 closeDialog={ (inputText) => {onPressButton2(inputText)}}>
         </DialogInput>
     );
-  // }
 }
-
 
 function showAlert(title,message)
 {
@@ -136,7 +134,7 @@ export default function App() {
             });
           break;
 
-          case 'phone number':
+        case 'phone number':
           const phoneNumber = await Pushe.getUserPhoneNumber();
           updateState(
             {
@@ -152,8 +150,8 @@ export default function App() {
             });
           break;
 
-          case 'email':
-            const email = await Pushe.getUserEmail();
+        case 'email':
+          const email = await Pushe.getUserEmail();
             updateState(
               {
                 type: ACTIONS.SHOW_DIALOG,
@@ -166,66 +164,195 @@ export default function App() {
                   button2Action:() => { updateState({type: ACTIONS.HIDE_DIALOG});}
                  }
               });
-            break;
-            case 'module initialization':
-              const isInitialized = await Pushe.isInitialized()
-              updateState({type: ACTIONS.APPEND_LOG,log:state.log+"\n------------\n"+`Modules Initialized: ${isInitialized}\n ${ new Date().toLocaleString()}`});
-              break;
+          break;
+        case 'module initialization':
+          const isInitialized = await Pushe.isInitialized()
+          updateState({type: ACTIONS.APPEND_LOG,log:state.log+"\n------------\n"+`Modules Initialized: ${isInitialized}\n ${ new Date().toLocaleString()}`});
+          break;
 
-            case 'device registration':
-              const isRegistered = await Pushe.isRegistered()
-              updateState({type: ACTIONS.APPEND_LOG,log:state.log+"\n------------\n"+`Device Registered: ${isRegistered}\n ${ new Date().toLocaleString()}`});
-              break;
+        case 'device registration':
+          const isRegistered = await Pushe.isRegistered()
+          updateState({type: ACTIONS.APPEND_LOG,log:state.log+"\n------------\n"+`Device Registered: ${isRegistered}\n ${ new Date().toLocaleString()}`});
+          break;
 
-            case 'topic':
-                const topics = await Pushe.getSubscribedTopics();
-                updateState(
-                  {
-                    type: ACTIONS.SHOW_DIALOG,
-                    payload:{
-                      title:'Topic',
-                      message:`Topics: [${topics}]`,
-                      button1Title:'Subscribe',
-                      button2Title: 'Unsubscribe',
-                      button1Action:(inputData) => {  Pushe.subscribeToTopic(inputData); 
-                                                      updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Subscribed to ${inputData}\n ${ new Date().toLocaleString()}`});
-                                                   },
-                      button2Action:(inputData) => { if(inputData!="")
-                                                          {
-                                                             Pushe.unsubscribeFromTopic(inputData);
-                                                             updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Unsubscribe from ${inputData}\n ${ new Date().toLocaleString()}`});
-                                                          }
-                                                      else
-                                                      updateState({type: ACTIONS.HIDE_DIALOG,log:state.log});
-                                                   }
-                     }
-                  });
-                break;
+        case 'topic':
+          const topics = await Pushe.getSubscribedTopics();
+          updateState(
+            {
+              type: ACTIONS.SHOW_DIALOG,
+              payload:{
+                title:'Topic',
+                message:`Topics: [${topics}]`,
+                button1Title:'Subscribe',
+                button2Title: 'Unsubscribe',
+                button1Action:(inputData) => {  Pushe.subscribeToTopic(inputData); 
+                                                updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Subscribed to ${inputData}\n ${ new Date().toLocaleString()}`});
+                                             },
+                button2Action:(inputData) => { if(inputData!="")
+                                                {
+                                                  Pushe.unsubscribeFromTopic(inputData);
+                                                  updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Unsubscribe from ${inputData}\n ${ new Date().toLocaleString()}`});
+                                                }
+                                                else
+                                                  updateState({type: ACTIONS.HIDE_DIALOG,log:state.log});
+                                             }
+              }
+            });
+          break;
                 
-            case 'tag':
-                  const topics = await Pushe.getSubscribedTopics();
-                  updateState(
-                    {
-                      type: ACTIONS.SHOW_DIALOG,
-                      payload:{
-                        title:'Topic',
-                        message:`Topics: [${topics}]`,
-                        button1Title:'Subscribe',
-                        button2Title: 'Unsubscribe',
-                        button1Action:(inputData) => {  Pushe.subscribeToTopic(inputData); 
-                                                        updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Subscribed to ${inputData}\n ${ new Date().toLocaleString()}`});
-                                                     },
-                        button2Action:(inputData) => { if(inputData!="")
-                                                            {
-                                                               Pushe.unsubscribeFromTopic(inputData);
-                                                               updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Unsubscribe from ${inputData}\n ${ new Date().toLocaleString()}`});
-                                                            }
-                                                        else
-                                                        updateState({type: ACTIONS.HIDE_DIALOG,log:state.log});
-                                                     }
+        case 'tag':
+          const tags = await Pushe.getSubscribedTags();
+          const message = Object.entries(tags).map((tag,idx) => {
+              return (
+              `${tag[0]}:${tag[1]}`
+              ) 
+          });
+
+          updateState(
+            {
+              type: ACTIONS.SHOW_DIALOG,
+              payload:{
+                title:'Tags',
+                message:`Tags:\n {${message}}\n Enter name:value format for adding tag\nEnter key1,key2 format for removing tag(s)`,
+                button1Title:'Add',
+                button2Title: 'Remove',
+                button1Action:(inputData) => { 
+                    if (typeof inputData !== 'string') return;
+                    const data = inputData.split(':');
+                    obj = {};
+                    obj[data[0]] = data[1];
+                    Pushe.addTags(obj); 
+                    updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Tag ${data[0]} added\n ${ new Date().toLocaleString()}`});
+                                             },
+                button2Action:(inputData) => { if(inputData!=="")
+                                                  {
+                                                    if (typeof inputData !== 'string') return;
+                                                    const data = inputData.split(',');
+                                                    const keyList = [];
+                                                    data.forEach(function(item,idx)
+                                                      {
+                                                         keyList[idx] = item;
+                                                      });
+                                                     
+                                                    Pushe.removeTags(keyList);
+                                                    updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Tag(s) ${keyList} removed \n ${ new Date().toLocaleString()}`});
+                                                  }
+                                                  else
+                                                    updateState({type: ACTIONS.HIDE_DIALOG,log:state.log});
+                                              }
                        }
-                    });
-                  break;
+            });
+          break;
+
+        case 'event':
+          updateState(
+            {
+              type: ACTIONS.SHOW_DIALOG,
+              payload:{
+                title:'Event',
+                message:`Type event name to send`,
+                button1Action:(inputData) => {  Pushe.sendEvent(inputData); 
+                                                updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Sending event ${inputData}\n ${ new Date().toLocaleString()}`});
+                                              },
+                button2Action:() => { updateState({type: ACTIONS.HIDE_DIALOG});}
+                }
+            });
+          break;
+
+        case 'ecommerce':
+          updateState(
+          {
+            type: ACTIONS.SHOW_DIALOG,
+            payload:{
+              title:'E-Commerce',
+              message:`Enter value in name:price format to send data`,
+              button1Action:(inputData) => {
+                if (typeof inputData !== 'string') return;
+                const data = inputData.split(':');
+                if(data.length!==2) return;
+                  Pushe.sendEcommerceData(data[0],parseFloat(data[1])); 
+                                              updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Sending E-Commerce data with name ${data[0]} and price ${data[1]}\n ${ new Date().toLocaleString()}`});
+                                            },
+              button2Action:() => { updateState({type: ACTIONS.HIDE_DIALOG});}
+              }
+          });
+          break;
+
+        case 'notif-androidid':
+          {
+            const androidId = await Pushe.getAndroidId();
+            console.log(androidId);
+            updateState(
+            {
+              type: ACTIONS.SHOW_DIALOG,
+              payload:{
+                title:'Notification',
+                message:`Enter android id to send notification to the user`,
+                button1Title:'Send to ...',
+              button2Title: 'Send to me',
+                button1Action:(inputData) => {
+                                                Pushe.sendNotificationToUser({type:Pushe.ANDROID_ID_TYPES.ANDROID_ID,userId:inputData,title:'hi',content:'how are you?'});
+                                                updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Sending notification to android id:${inputData} \n ${ new Date().toLocaleString()}`});
+                                              },
+                button2Action:() => {
+                  Pushe.sendNotificationToUser({type:Pushe.ANDROID_ID_TYPES.ANDROID_ID,userId:androidId,title:'hi',content:'how are you?'});
+                  updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Sending notification to this device\n ${ new Date().toLocaleString()}`});
+
+                  }
+                }
+            });
+          }
+          break;
+
+        case 'notif-googleid':
+          {
+            const googleId = await Pushe.getGoogleAdvertisingId();
+            updateState(
+            {
+              type: ACTIONS.SHOW_DIALOG,
+              payload:{
+                title:'Notification',
+                message:`Enter google ad id to send notification to the user`,
+                button1Title:'Send to ...',
+              button2Title: 'Send to me',
+                button1Action:(inputData) => {
+                                                Pushe.sendNotificationToUser({type:Pushe.ANDROID_ID_TYPES.ADVERTISEMENT_ID,userId:inputData,title:'hi',content:'how are you?'});
+                                                updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Sending notification to google ad id:${inputData} \n ${ new Date().toLocaleString()}`});
+                                              },
+                button2Action:() => {
+                  Pushe.sendNotificationToUser({type:Pushe.ANDROID_ID_TYPES.ADVERTISEMENT_ID,userId:googleId,title:'hi',content:'how are you?'});
+                  updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Sending notification to this device\n ${ new Date().toLocaleString()}`});
+
+                  }
+                }
+            });
+          }
+          break;
+
+        case 'notif-customid':
+          {
+            const customId = await Pushe.getCustomId();
+            updateState(
+            {
+              type: ACTIONS.SHOW_DIALOG,
+              payload:{
+                title:'Notification',
+                message:`Enter custom id to send notification to the user`,
+                button1Title:'Send to ...',
+              button2Title: 'Send to me',
+                button1Action:(inputData) => {
+                                                Pushe.sendNotificationToUser({type:Pushe.ANDROID_ID_TYPES.CUSTOM_ID,userId:inputData,title:'hi',content:'how are you?'});
+                                                updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Sending notification to custom id:${inputData} \n ${ new Date().toLocaleString()}`});
+                                              },
+                button2Action:() => {
+                  Pushe.sendNotificationToUser({type:Pushe.ANDROID_ID_TYPES.CUSTOM_ID,userId:customId,title:'hi',content:'how are you?'});
+                  updateState({type: ACTIONS.HIDE_DIALOG,log:state.log+"\n------------\n"+`Sending notification to this device\n ${ new Date().toLocaleString()}`});
+
+                  }
+                }
+            });
+          } 
+          break;
       }
     }
   );
