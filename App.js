@@ -114,9 +114,9 @@ export default function App() {
     async (id) => {
       switch(id) {
         case 'ids' : 
-          const androidId = await Pushe.getAndroidId();
+          const deviceId = await Pushe.getDeviceId();
           const adId = await Pushe.getGoogleAdvertisingId();
-          showAlert("IDs",`Android Id:\n ${androidId} \nGoogle Ad Id:\n ${adId}`);
+          showAlert("IDs",`Device Id:\n ${deviceId} \nGoogle Ad Id:\n ${adId}`);
           break;
         case 'custom id':
           const customId = await Pushe.getCustomId();
@@ -360,8 +360,8 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-      <Text style = {{color:'#17202A',fontSize : 18,textAlign:'center',fontWeight:'bold'}}>Pushe Sample</Text>
-      <Text style = {{color:'#FDFEFE',fontSize : 15 ,textAlign:'center'}}>React Native Module: 2.0.1 | native version: 2.0.4</Text>
+      <Text style = {{color:'#FDFEFE',fontSize : 18,textAlign:'center',fontWeight:'bold'}}>Pushe Sample</Text>
+      <Text style = {{color:'#FDFEFE',fontSize : 15 ,textAlign:'center'}}>React Native Module: 2.1.1 | native version: 2.1.1</Text>
       </View>
       <FlatList style = {styles.flatList}
         data={DATA}
@@ -387,6 +387,9 @@ export default function App() {
   );
 }
 
+// Pushe primary color : 0065ff
+// Pushe accent color : 00feb6
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -395,7 +398,7 @@ const styles = StyleSheet.create({
   header :
   {
     alignContent :'center',
-    backgroundColor:'#2E86C1',
+    backgroundColor:'#00feb6',
     paddingTop:8,
     paddingBottom :8,
   },
@@ -412,7 +415,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 15,
-    color:'#3498DB',
+    color:'#0065ff',
     textAlign:'center'
   },
   scrollView :
